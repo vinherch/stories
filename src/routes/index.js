@@ -8,6 +8,8 @@ const { getStories } = require("../helpers/storyHelper");
 //Welcome Landing page
 //GET /
 router.get("/", (req, res) => {
+  //Check for valid token - if true redirect to dashboard
+  if (req.cookies.token) return res.redirect("/dashboard");
   res.render("welcome", {
     title: "Welcome - Vinher Test App",
     layout: "./layouts/welcome",
