@@ -1,8 +1,9 @@
 const dbConnectionHelper = require("./dbConnectionHelper");
-const Story = require("../mongodb/models/story");
+const Story = require("../mongodb/models/Story");
+const dateHelper = require("./dateHelper");
 
-async function createStory(req, res) {
-  //Create an user instance & save in db
+//Create new story
+async function create(req, res) {
   const story = new Story({
     title: req.body.title,
     description: req.body.description,
@@ -10,17 +11,50 @@ async function createStory(req, res) {
   });
   try {
     await dbConnectionHelper.connect();
-    const savedStory = await story.save();
-    //Flash Message - Story created
-    req.flash("success_msg", "Story successfuly created!");
-    //Redirect to Dashboard
-    res.redirect("/dashboard");
+    const newStory = await story.save();
+    if (newStory) {
+      return { status: true, inserted: newStory };
+    }
+  } catch (err) {
+    return err;
+  } finally {
+    //Close db connection
+    dbConnectionHelper.disconnect();
+  }
+}
+
+//Update existing story
+async function update(req, res) {
+  try {
+    await dbConnectionHelper.connect();
+    const result = await Story.findOneAndUpdate(
+      { _id: req.body.storyId },
+      { $set: { title: req.body.title, description: req.body.description, updated: Date.now() } }
+    );
+    if (result) {
+      return { status: true, updated: result };
+    }
+  } catch (err) {
+    return err;
+  } finally {
+    //Close db connection
+    dbConnectionHelper.disconnect();
+  }
+}
+
+async function deleteStory(req, res) {
+  try {
+    await dbConnectionHelper.connect();
+    //Delete selected story
+    const deleted = await Story.deleteOne({ _id: req.params.id });
+    if (deleted.deletedCount === 1) {
+      return true;
+    }
+    return false;
   } catch (err) {
     res.status(500);
     //Flash Message - DB Failure
     req.flash("error_msg", `Database Error: ${err.message}`);
-    //Redirect to Login
-    res.redirect("/dashboard");
   } finally {
     //Close db connection
     dbConnectionHelper.disconnect();
@@ -31,18 +65,28 @@ async function createStory(req, res) {
 async function getStories(userID) {
   try {
     await dbConnectionHelper.connect();
-    const stories = await Story.find().populate("userID").select("title description").where("userID").equals(userID);
+    const stories = await Story.find()
+      .populate("userID")
+      .select("title description created updated")
+      .where("userID")
+      .equals(userID)
+      .sort({ created: -1 });
+    //Adding formatted date fields for existing stories
+    if (stories.length !== 0) {
+      stories.forEach((s) => {
+        s.formattedCreated = dateHelper(s.created);
+        s.formattedUpdated = dateHelper(s.updated);
+      });
+    }
     return stories;
   } catch (err) {
-    res.status(500);
-    //Flash Message - DB Failure
-    req.flash("error_msg", `Database Error: ${err.message}`);
-    //Redirect to Login
-    res.redirect("/dashboard");
+    return err;
   } finally {
     dbConnectionHelper.disconnect();
   }
 }
 
-module.exports.createStory = createStory;
+module.exports.createStory = create;
+module.exports.updateStory = update;
+module.exports.deleteStory = deleteStory;
 module.exports.getStories = getStories;
