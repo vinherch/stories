@@ -2,6 +2,7 @@ const router = require("express").Router();
 
 const authorization = require("../middleware/authorization");
 const { getStories } = require("../helpers/storyHelper");
+const dateHelper = require("../helpers/dateHelper");
 
 //Routes
 
@@ -29,7 +30,7 @@ router.get("/dashboard", authorization, async (req, res) => {
       email: req.user.userEmail,
       firstname: req.user.firstname,
       lastname: req.user.lastname,
-      date: req.user.date,
+      date: dateHelper(new Date(req.user.date)),
       stories: userStories,
     },
   });
