@@ -230,7 +230,7 @@ button {
 .story h5::after {
   content: "";
   position: absolute;
-  top: 120%;
+  top: 125%;
   left: 0;
   width: 75%;
   border-radius: 50%;
