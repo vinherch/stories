@@ -1,0 +1,22 @@
+<%- include("./partials/message.ejs") %>
+<form class="mt-4 p-3" action="/stories/update/" method="POST">
+  <div class="mb-4">
+    <input type="hidden" id="story-Id" name="storyId" class="form-control" value="<%= story.id %>" />
+  </div>
+  <div class="mb-4">
+    <label for="title" class="form-label">Story Title</label>
+    <br />
+    <input type="text" id="title" name="title" size="40" class="form-control" value="<%= story.title %>" />
+  </div>
+  <div class="mb-2">
+    <label for="description" class="form-label">Story Description</label><br />
+    <textarea name="description" id="description" cols="40" rows="15" class="form-control"><%= story.description %></textarea>
+  </div>
+  <div>
+    <div class="story-timestamp">
+      Last Modified:<br />
+      <span><%= story.lastmodified %></span>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary mx-auto mt-2" style="display: block">Update</button>
+</form>
