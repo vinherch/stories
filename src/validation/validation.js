@@ -21,9 +21,19 @@ const validateLoginUser = (user) => {
   return schema.validate(user);
 };
 
-//Story Validation
+//Story Validation for new story
 const validateStory = (story) => {
   const schema = joi.object({
+    title: joi.string().required().min(2).max(64),
+    description: joi.string().required().max(2048),
+  });
+  return schema.validate(story);
+};
+
+//Story Validation for updating story
+const validateUpdatedStory = (story) => {
+  const schema = joi.object({
+    storyId: joi.string().required(),
     title: joi.string().required().min(2).max(64),
     description: joi.string().required().max(2048),
   });
@@ -33,3 +43,4 @@ const validateStory = (story) => {
 module.exports.validateRegisterUser = validateRegisterUser;
 module.exports.validateLoginUser = validateLoginUser;
 module.exports.validateStory = validateStory;
+module.exports.validateUpdatedStory = validateUpdatedStory;
