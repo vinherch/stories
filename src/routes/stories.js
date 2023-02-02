@@ -105,8 +105,8 @@ router.get("/delete/:id", authorization, async (req, res) => {
   //Delete Story
   const result = await deleteStory(req, res);
   if (result) {
-    //Flash Message - Story updated
-    req.flash("success_msg", "Story successfuly updated!");
+    //Flash Message - Story deleted
+    req.flash("success_msg", "Story successfuly deleted!");
     res.status(200).send();
     return;
   }
